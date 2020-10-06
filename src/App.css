@@ -1,0 +1,78 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.heading01{
+  color:#7c90ef;
+  font-weight: bold;
+  font-size: 3.2em;
+}
+
+.heading02{
+  color:#c7c7c7;
+  font-weight: normal;
+  font-size: 1.2em;
+}
+
+.cartButton{
+  padding: 4px 12px;
+}
+
+.dropdown-toggle::after {
+  display: none!important;
+}
+
+.dropdown-toggle::before {
+  display: inline-block;
+  margin-right: 0.8em;
+  vertical-align: -0.4em;
+  content: url("https://img.icons8.com/office/30/000000/shopping-cart.png");
+  border-top: 0em solid;
+  border-right: 0em solid transparent;
+  border-bottom: 0;
+  border-left: 0em solid transparent;
+}
+
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.formControlInput{
+  display: inline-block!important;
+  width: 20%!important;
+  margin-right:12px;
+  margin-left: -60px;
+}
+
