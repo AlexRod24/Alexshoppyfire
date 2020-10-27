@@ -1,5 +1,5 @@
 # ShoppyFire
-The e-commerce project that spits fire !
+The e-commerce project that spits firegit!
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -30,5 +30,12 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 - Create a pull request.
 - Ask for my review.
 - Push your changes.
+
+## Extra Docs
+- [Enviroment Doc]('docs/Enviroment.md')
+
+
+
+
 
 
