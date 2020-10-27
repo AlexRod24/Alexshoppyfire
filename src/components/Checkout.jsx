@@ -3,8 +3,10 @@ import { CartContext } from '../context/CartContext'
 import { Button, Card, Col, Row, Form, Modal, Table} from "react-bootstrap";
 import { getFirestore } from "../firebase";
 import * as firebase from 'firebase/app';
+import { Titulo } from './Home';
 import 'firebase/firestore';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import PageLoader from './PageLoader';
 
 
 
@@ -14,11 +16,12 @@ export default function Checkout(){
     const [cart, setCart] = value1;
     const [cartCant, setCartCant] = value2;
     const [cartCantItem, setCartCantItem] = value3;
-    const [userInfo, setUserInfo] = useState({name:'', phone:'', email:''});
+    const [userInfo, setUserInfo] = useState([]);
     const [orderId, setOrderId] = useState('');
     const [loading, setLoading] = useState(false);
     const [modal, setModal] = useState(false);
-
+    var itemId;
+ 
 
     /* Devuelve la cantidad de items por producto */
     const itemCantidad = (e) => {
@@ -30,9 +33,8 @@ export default function Checkout(){
         return sumCartCantResult.reduce(reducer);
     };
 
-    var itemId;
 
-    /* Devuelve el Preio total */
+    /* Devuelve el Precio total */
     const totalPrice = () => {
         const array = cart.map(function (el) { return parseInt(el.price.replace('.', '')) * itemCantidad(itemId) });
         const reducer = (accumulator, currentValue) => accumulator + currentValue;
@@ -67,6 +69,7 @@ export default function Checkout(){
         });
     }
 
+
     /* Envía el pedido de compra a Firebase */
    const setOrder = () => {
         setModal(true);
@@ -76,7 +79,7 @@ export default function Checkout(){
         const orders = db.collection('orders');
 
         const newOrder = {
-            buyer: {name:'Alejandro Rodriguez', phone:'03424077800', email:'alexrodrz24@gamil.com'},
+            buyer: userInfo,
             items: cartInfoSend(),
             date: firebase.firestore.Timestamp.fromDate(new Date()),
             total: totalPrice()
@@ -86,43 +89,65 @@ export default function Checkout(){
                 setOrderId(id);
                 /* Actualiza el stock de cada producto comprado */
                 const batch = db.batch();
-                cart.map(el => {
-                    const docRef = db.collection('items').doc(el.id);
-                    batch.update(docRef, {stock: el.stock - itemCantidad(el.id)});
-                })
+                cart.map(function (el) {
+                    return batch.update(db.collection('items').doc(el.id), {
+                            stock: el.stock - itemCantidad(el.id)
+                        });
+                    })
                 batch.commit().then(r => r);
             }).catch(err => {
-            console.log('Error searching items', err);
+            console.log('Hubo un error al buscar el item', err);
             }).finally(() => {
                 setLoading(false);
                 setModal(true);
+                setCart([]);
+                setCartCant(0);
+                setCartCantItem([]);
             });
         };
 
 
     if(loading){
-        return <div style={{fontSize: '18px', color:'#fff'}}>Cargando información...</div>
+        return <PageLoader/>
     }
+    
 
     if(modal){
-        return <Modal show={modal} onHide={handleCloseModal} animation={false}>
-            <Modal.Header>
-                <Modal.Title style={{fontSize: '16px', color:'#000',textAlign:'left', fontWeight:'700'}}>Su compra fue realizada con éxito</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <p style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'500'}}>Su orden fue procesada con número de Id: {orderId}</p>
-                <p style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'500'}}>Gracias por su compra.</p>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="primary"><Link to={"/"} style={{color:'#ffffff'}}>Volver al Inicio</Link></Button>
-            </Modal.Footer>
-        </Modal>
+        return <Modal
+                show={modal}
+                onHide={handleCloseModal}
+                animation={false}>
+                    <Modal.Header>
+                        <Modal.Title
+                            className='modal-title'>
+                            Su compra fue realizada con éxito
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p className='modal-p'>
+                            Su orden fue procesada con número de Id: {orderId}
+                        </p>
+                        <p className='modal-p'>
+                            Gracias por su compra.
+                        </p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            variant="primary">
+                            <Link
+                                to={"/pedidos"}
+                                style={{color:'#ffffff'}}
+                                >Ver el pedido
+                            </Link>
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
     }
 
     return (
-     <Card style={{width: '75%', margin: '50px auto 50px auto', padding:'55px'}}>
-         <h1 className="heading02">Checkout</h1>
-         <Row style={{marginBottom: '40px'}}>
+     <Card style={{width: '75%', margin: '50px auto', padding:'60px'}}>
+         <Titulo texto="Checkout"/>
+         <Row style={{margin: '40px auto'}}>
              <Col>
                  <Form
                      style={{width: '75%'}}
@@ -164,33 +189,37 @@ export default function Checkout(){
                  </Form>
              </Col>
              <Col>
-                 <Table>
+                 <Table className='form-table'>
                      <thead>
                      <tr>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}>Cant.</th>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}>Producto</th>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}></th>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}></th>
+                         <th>Cant.</th>
+                         <th>Imagen</th>
+                         <th>Producto</th>
+                         <th>Precio</th>
                      </tr>
                      </thead>
                      <tbody>
                          {cart.map(el => {
                          return <tr key={el.id}>
-                             <td style={{width: '20%', fontSize: '13px', color:'#000', textAlign:'left', paddingLeft: '0rem!important'}}>{itemCantidad(el.id)}</td>
-                             <td style={{fontSize: '13px', color:'#000', textAlign:'left', paddingLeft: '0rem!important'}}>
-                                 <Card.Img style={{width: '30%'}} variant="top" src={el.thumbnail}/>
+                             <td style={{width:'20%'}}>{itemCantidad(el.id)}</td>
+                             <td>
+                                 <Card.Img
+                                    style={{width:'30%'}}
+                                    variant="top"
+                                    src={el.thumbnail}
+                                 />
                              </td>
-                             <td style={{width: '20%', fontSize: '13px', color:'#000', textAlign:'left', paddingLeft: '0rem!important'}}>${el.price}</td>
-                             <td style={{width: '30%', fontSize: '13px', color:'#000', textAlign:'left', paddingLeft: '0rem!important'}}>{el.title}</td>
+                             <td style={{width:'30%'}}>{el.title}</td>
+                             <td style={{width:'20%'}}>${el.price}</td>
                          </tr>})
                          }
                      </tbody>
-                     <thead>
+                     <thead className='total-checkout'>
                      <tr>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}>N° de items: {cartCant}</th>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}></th>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}>Total: ${totalPrice()}</th>
-                         <th style={{fontSize: '13px', color:'#000',textAlign:'left', fontWeight:'700'}}></th>
+                         <th>Cant. items: {cartCant}</th>
+                         <th>&nbsp;</th>
+                         <th>&nbsp;</th>
+                         <th>Precio Final: ${totalPrice()}</th>
                      </tr>
                      </thead>
                  </Table>

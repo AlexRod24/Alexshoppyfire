@@ -3,6 +3,10 @@ import { Form } from "react-bootstrap";
 
 export default function Input(props){
     return(
-        <Form.Control type="text" onChange={props.handleChange} value={props.conteo}/>
+        <Form.Control
+            type="text"
+            onChange={props.handleChange}
+            value={props.conteo}
+        />
     )
 }

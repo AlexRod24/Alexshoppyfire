@@ -7,6 +7,9 @@ import Cart from './components/Cart';
 import ItemsContainer from "./components/ItemsContainer";
 import { CartProvider } from './context/CartContext';
 import Checkout from "./components/Checkout";
+import Pedidos from "./components/Pedidos";
+import style from 'bootstrap/dist/css/bootstrap.css';
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
 
 export default function App() {
@@ -15,26 +18,26 @@ export default function App() {
         <BrowserRouter>
             <CartProvider>
                 <Navbar/>
-                    <header className="App-header">
                       <Switch>
                               <Route exact path="/">
                                   <Home/>
                               </Route>
                               <Route path="/productos">
-                                <ItemsContainer/>
+                                  <ItemsContainer/>
                               </Route>
                               <Route path="/carrito">
                                   <Cart/>
+                              </Route>
+                              <Route path="/pedidos">
+                                  <Pedidos/>
                               </Route>
                               <Route path="/checkout">
                                   <Checkout/>
                               </Route>
                       </Switch>
-                    </header>
         </CartProvider>
       </BrowserRouter>
     </div>
-
   );
 }
 

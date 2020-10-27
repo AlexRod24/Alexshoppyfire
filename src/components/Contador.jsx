@@ -1,18 +1,19 @@
 import React from "react";
 import Boton from './Boton';
 import Input from './Input';
-import { Form, Col } from 'react-bootstrap';
-import { Button } from 'react-bootstrap';
+import { Form, Col, Modal, Button } from 'react-bootstrap';
+import { Link } from "react-router-dom"
 
 
 export default class Contador extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            conteo: 0
+            conteo: 0,
+            modal: false
         };
         this.conteoMinimo = 0;
-        this.conteoMaximo = 10;
+        this.conteoMaximo = this.props.stock;
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -24,6 +25,10 @@ export default class Contador extends React.Component {
 
     handleClick = () => {
         this.props.sendConteo(this.state.conteo);
+        this.setState({
+            modal: true
+          });
+        this.borrar();
     }
 
     sumar = () => {
@@ -47,6 +52,11 @@ export default class Contador extends React.Component {
             conteo: 0
         }));
     };
+
+    
+    handleCloseModal = () => this.setState({
+        modal: false
+    });
 
 
     render(){
@@ -79,17 +89,53 @@ export default class Contador extends React.Component {
                         {this.state.conteo === 0 ?
                             <Button
                                 disabled
-                                onClick={this.handleClick}
-                                style={{width:'78%', fontSize:'15px'}} variant="primary" size="lg" className='mt-4'>
-                                Añadir {this.state.conteo >= 1 ? this.state.conteo : " "} al Carrito
+                                style={{width:'78%', fontSize:'15px', height:'38px'}}
+                                variant="primary"
+                                size="lg"
+                                className='mt-4'>
+                                Añadir al Carrito
                             </Button> :
                             <Button
                                 onClick={this.handleClick}
-                                style={{width:'78%', fontSize:'15px'}} variant="primary" size="lg" className='mt-4'>
+                                style={{width:'78%', fontSize:'15px', height:'38px'}}
+                                variant="primary"
+                                size="lg"
+                                className='mt-4'>
                                 Añadir {this.state.conteo >= 1 ? this.state.conteo : " "} al Carrito
                             </Button>}
                     </Form.Row>
                 </Form.Group>
+                <Modal
+                    show={this.state.modal}
+                    onHide={this.handleCloseModal}
+                    animation={true}>
+                        <Modal.Header>
+                            <Modal.Title
+                                className='modal-title'>
+                                Se ha añadido el item con éxito
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Footer>
+                            <Button
+                                variant="primary"
+                                onClick={this.handleCloseModal}
+                                style={{color:'#ffffff'}}
+                            >
+                                Seguir Comprando
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={this.handleCloseModal}
+                                style={{color:'#ffffff'}}
+                            >
+                                <Link
+                                    to={"/carrito"}
+                                    style={{color:'#ffffff'}}
+                                    >Ir al carrito
+                                </Link>
+                            </Button>
+                        </Modal.Footer>
+                </Modal>
              </div>
         );
     };

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ItemCard from './ItemCard';
 import ItemDetail from './ItemDetail';
+import { Titulo } from './Home';
 import { CardDeck } from "react-bootstrap";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { getFirestore } from "../firebase";
 import { CartContext } from "../context/CartContext";
+import PageLoader from './PageLoader';
 
 
 
@@ -26,17 +28,18 @@ export default function ItemsContainer() {
         itemCollection.get()
             .then((querySnapshot) => {
                 if (querySnapshot.size === 0) {
-                    console.log('no results');
+                    console.log('No se han encontrado resultados');
                 }
                 setItems(querySnapshot.docs.map(doc => {
                     return ({ id: doc.id, ...doc.data() });
                 }));
             }).catch((error) => {
-            console.log('Error searching items', error);
+            console.log('Hubo un error en la búsqueda', error);
         }).finally(() => {
             setLoading(false);
         });
     }, []);
+
 
 
     /* Añade el Item y su cantidad (si ya existe en el Cart, solo añade la cantidad y la suma a la existente en ese item) */
@@ -53,7 +56,6 @@ export default function ItemsContainer() {
             if(!cartCantArray.includes(itemActual.id)) {
                 setCart(currentCart =>  [...currentCart, itemActual]);
                 setCartCantItem(currentCartCantItem =>  [...currentCartCantItem, [itemActual.id, estadoContador]]);
-                console.log("agregado");
             }
             else{
                 const find = (e) => e[0] === itemActual.id;
@@ -62,32 +64,38 @@ export default function ItemsContainer() {
                 setCartCantItem( current =>
                     [...current, [cartCantItem[idCheck][0], estadoContador]]
                 );
-                console.log("no agregado");
             }
     };
 
 
     if(loading){
-        return <div style={{fontSize: '18px', color:'#fff'}}>Cargando información...</div>
+        return <PageLoader/>
     }
 
 
     return(
-        <BrowserRouter>
+        <div style={{backgroundColor:'#f6f6f6', padding:'30px 0 80px 0'}}>  
             <Switch>
                 <Route path="/productos/:id">
-                    <ItemDetail data={items} conteoActual={addToCart}/>
+                    <ItemDetail
+                    conteoActual={addToCart}
+                    />
                 </Route>
                 <Route path="/productos">
-                    <CardDeck style={{width:'1270px', margin: '30px 30px 50px'}}>
-                 {
-                   items.map(item =>
-                      <ItemCard key={item.id} datos={item} conteoActual={addToCart}/>
-                      )
-                  }
+                     <Titulo texto="Nuestros Productos"/>
+                    <CardDeck>
+                        {
+                        items.map(item =>
+                            <ItemCard
+                                key={item.id}
+                                datos={item}
+                                conteoActual={addToCart}
+                            />
+                            )
+                        }
                     </CardDeck>
                 </Route>
             </Switch>
-        </BrowserRouter>
+        </div>
     )
 }
