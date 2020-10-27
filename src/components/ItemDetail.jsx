@@ -29,7 +29,7 @@ export default function ItemDetail(props) {
                     if (!doc.exists) {
                         console.log('No se han encontrado resultados');
                     }
-                    setProduct( doc.data() );
+                    setProduct({ id: doc.id, ...doc.data() }); 
                 }).catch((error) => {
                 console.log('Hubo un error en la búsqueda', error);
             }).finally(() => {
